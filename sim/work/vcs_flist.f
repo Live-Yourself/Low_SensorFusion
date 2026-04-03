@@ -65,4 +65,5 @@
 +
 +../uvm/if/apb_if.sv
 +../uvm/common/soc_uvm_pkg.sv
++../uvm/tb/tb_connect.sv
 +../uvm/tb/tb_top.sv

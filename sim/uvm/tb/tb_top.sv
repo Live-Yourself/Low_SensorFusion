@@ -15,6 +15,7 @@ module tb_top;
   logic uart_rx_i, uart_tx_o;
 
   apb_if apb_if0(.pclk(clk_sys), .presetn(por_n));
+  tb_connect u_tb_connect(.apb_if0(apb_if0));
 
   sf_soc_top dut (
     .clk_sys     (clk_sys),
@@ -62,8 +63,4 @@ module tb_top;
     por_n = 1'b1;
   end
 
-  initial begin
-    uvm_config_db#(virtual apb_if)::set(null, "*", "apb_vif", apb_if0);
-    run_test("smoke_apb_test");
-  end
 endmodule
