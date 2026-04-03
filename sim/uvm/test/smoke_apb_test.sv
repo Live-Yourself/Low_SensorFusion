@@ -1,4 +1,4 @@
-﻿class smoke_apb_test extends base_test;
+class smoke_apb_test extends base_test;
   `uvm_component_utils(smoke_apb_test)
 
   function new(string name = "smoke_apb_test", uvm_component parent = null);
