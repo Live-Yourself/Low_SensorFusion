@@ -33,6 +33,72 @@
 - 事件中断：`event_intc`
 - 轻量融合：`fusion_preproc`
 
+### 3.1 按实际 RTL（`rtl/top/sf_soc_top.sv`）提炼的模块关系图
+
+```text
+APB Host
+  |
+  | paddr/psel/penable/pwrite/pwdata
+  v
+apb_decoder (paddr[15:12] -> psel_vec[12:0])
+  |------------------------------ APB片选 ------------------------------|
+  |                                                                     |
+  +--> PMU(1)   <----- wake inputs ----- RTC irq(0)
+  |                                  \--- GPIO irq(1)
+  |                                  \--- I2C0 irq(6)
+  |                                  \--- I2C1 irq(7)
+  |                                  \--- TIMER/WDT irq(2/3)
+  |
+  +--> RTC(2) -------------------------------> rtc_irq --------------------+
+  +--> I2C0(8) ------------------------------> i2c0_irq -------------------+
+  +--> I2C1(9) ------------------------------> i2c1_irq -------------------+
+  +--> UDMA(10) -----------------------------> udma_irq -------------------+
+  +--> FUSION(12) ---------------------------> fusion_irq -----------------+
+                                                 |
+  +--> EVENT_INTC(11) <--- irq_src[31:0] 汇聚总线 <----------------------+
+                  {fusion, udma, i2c1, i2c0, spi, uart,
+                  timer_wdt, gpio, rtc, 其余补0}
+                        |
+                        +--> cpu_irq（当前顶层已连出，未继续下接CPU）
+
+APB读回：各从设备 prdata/pready/pslverr -> 顶层 mux -> APB Host
+```
+
+### 3.2 关键信号流（PMU/RTC/I2C/UDMA/INTC/FUSION）
+
+1. **配置流（APB）**
+  - APB 主机通过地址访问 PMU/RTC/I2C0/I2C1/UDMA/FUSION/INTC 寄存器。
+  - `apb_decoder` 产生 one-hot `psel_vec`，各 IP 并行挂接，顶层统一读回 mux。
+
+2. **唤醒流（RTC/I2C -> PMU）**
+  - `rtc_irq`、`i2c0_irq`、`i2c1_irq`（以及 gpio/timer_wdt）直接进入 `sf_pmu_top` 的 `wake_*` 输入。
+  - PMU 核心依据 `wake_en` 与 `mode_req` 产生 `cur_mode` 和 `wake_cause`。
+
+3. **中断流（I2C/UDMA/FUSION/RTC -> INTC）**
+  - `sf_soc_top` 将各模块 `*_irq` 组装为 `irq_src[31:0]` 输入 `sf_event_intc_top`。
+  - INTC 提供 `mask/pend/clr` 管理，并输出统一 `cpu_irq`。
+
+4. **融合事件流（FUSION）**
+  - 当前 RTL 中 `sf_fusion_top` 的 `sample_i/sample_vld` 在顶层固定为 `0`。
+  - 因此现阶段主要验证其 APB 配置、状态寄存器与中断通路，尚未与 UDMA 数据面打通。
+
+5. **DMA事件流（UDMA）**
+  - `sf_udma_top` 已接入 APB 配置与 `udma_irq` 中断上报。
+  - 当前顶层尚未把 I2C/SPI/UART 数据面直接接到 UDMA，现阶段以寄存器/中断行为验证为主。
+
+### 3.3 与规格目标的对齐说明（当前版本）
+
+- 已具备：
+  - APB 控制面框架（译码、片选、读回）
+  - PMU 唤醒输入链路
+  - 多源中断汇聚到 INTC
+
+- 待增强（后续版本收敛）：
+  - `cpu_irq` 与真实 CPU 子系统闭环
+  - FUSION 输入与 UDMA 缓冲数据联动
+  - UDMA 与 I2C/SPI/UART 的数据面直连
+  - AON 时钟/复位在低功耗场景中的完整建模
+
 ---
 
 ## 4. 总线与地址架构
