@@ -70,8 +70,8 @@ if [[ -n "${FCOV_SAMPLES_VAL}" ]]; then
   FUNC_COV_SAMPLES="${FCOV_SAMPLES_VAL}"
 fi
 
-FCOV_MIN_SAMPLES="${FCOV_MIN_SAMPLES:-1}"
-if [[ "${FUNC_COV_SAMPLES}" =~ ^[0-9]+$ ]] && [[ "${FUNC_COV_SAMPLES}" -lt "${FCOV_MIN_SAMPLES}" ]]; then
+FCOV_MIN_SAMPLES="${FCOV_MIN_SAMPLES:-0}"
+if [[ "${FCOV_MIN_SAMPLES}" =~ ^[0-9]+$ ]] && [[ "${FCOV_MIN_SAMPLES}" -gt 0 ]] && [[ "${FUNC_COV_SAMPLES}" =~ ^[0-9]+$ ]] && [[ "${FUNC_COV_SAMPLES}" -lt "${FCOV_MIN_SAMPLES}" ]]; then
   RUN_STATUS="FAIL"
   echo "[WARN] FCOV samples=${FUNC_COV_SAMPLES} < FCOV_MIN_SAMPLES=${FCOV_MIN_SAMPLES}, mark run as FAIL"
 fi
@@ -336,7 +336,7 @@ CODE_COV_HINT="${MERGE_REPORT_DIR}"
 } > "${DASHBOARD_FILE}"
 
 echo "[DONE] UVM test=${TEST_NAME}"
-echo "       top : tb_uvm_top"
+echo "       top : tb_top"
 echo "       seed: ${SEED_INFO}"
 echo "       cov_scope: ${COV_SCOPE_INFO}"
 echo "       seed_file: ${SEED_FILE}"

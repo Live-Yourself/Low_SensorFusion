@@ -64,7 +64,7 @@ module sf_i2c_reg_top (
   always_comb begin
     prdata = 32'h0;
     case (paddr[7:0])
-      8'h00: prdata = {25'h0, dir, 2'b0, speed, i2c_en};
+      8'h00: prdata = {25'h0, dir, 3'b0, speed, i2c_en};
       8'h04: prdata = {25'h0, slv_addr};
       8'h0C: prdata = {24'h0, rx_data};
       8'h14: prdata = {27'h0, timeout, nack, done, busy};

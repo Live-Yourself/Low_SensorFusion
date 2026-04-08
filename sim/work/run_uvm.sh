@@ -78,7 +78,7 @@ VCS_CMD=(
   -cm line+cond+fsm+tgl+branch
   -cm_dir ${COV_RUN_DIR}
   -l ${LOG_FILE}
-  -o simv
+  -o ${RUN_WORK_DIR}/simv
 )
 
 if [[ "${COV_SCOPE}" == "dut" ]]; then
@@ -129,7 +129,7 @@ FSDB_REQUIRE="${FSDB_REQUIRE:-0}"
 
 VCS_RC=0
 RUN_ABORT_REASON=""
-if pushd "${RUN_WORK_DIR}" >/dev/null; then
+if pushd "${CDIR}" >/dev/null; then
   if "${VCS_CMD[@]}" -R; then
     VCS_RC=0
   else
@@ -146,7 +146,7 @@ if pushd "${RUN_WORK_DIR}" >/dev/null; then
 else
   VCS_RC=2
   RUN_ABORT_REASON="WORKDIR_ENTER_FAIL"
-  echo "[WARN] cannot enter run work dir: ${RUN_WORK_DIR}"
+  echo "[WARN] cannot enter compile dir: ${CDIR}"
 fi
 
 if [[ -f "${LOG_FILE}" ]]; then

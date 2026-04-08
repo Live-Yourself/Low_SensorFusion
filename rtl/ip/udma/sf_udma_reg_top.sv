@@ -59,7 +59,7 @@ module sf_udma_reg_top #(
 
   always_comb begin
     prdata = 32'h0;
-    if (paddr[7:0] == 8'h00) prdata = {31'h0, udma_en};
-    else if (paddr[7:0] == 8'h04) prdata = {{(32-N_CH){1'b0}}, done_lat};
+    if (paddr[11:0] == 12'h000) prdata = {31'h0, udma_en};
+    else if (paddr[11:0] == 12'h004) prdata = {{(32-N_CH){1'b0}}, done_lat};
   end
 endmodule

@@ -15,7 +15,11 @@ module tb_top;
   logic uart_rx_i, uart_tx_o;
 
   apb_if apb_if0(.pclk(clk_sys), .presetn(por_n));
-  tb_connect u_tb_connect(.apb_if0(apb_if0));
+
+  initial begin
+    uvm_config_db#(virtual apb_if)::set(null, "*", "apb_vif", apb_if0);
+    run_test("smoke_apb_test");
+  end
 
   sf_soc_top dut (
     .clk_sys     (clk_sys),
@@ -62,5 +66,15 @@ module tb_top;
     repeat (5) @(posedge clk_sys);
     por_n = 1'b1;
   end
+
+`ifdef DUMP_FSDB
+  initial begin
+    string fsdb_name;
+    if (!$value$plusargs("FSDB_FILE=%s", fsdb_name))
+      fsdb_name = "uvm_default.fsdb";
+    $fsdbDumpfile(fsdb_name);
+    $fsdbDumpvars(0, tb_top);
+  end
+`endif
 
 endmodule
