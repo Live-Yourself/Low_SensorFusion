@@ -1,6 +1,9 @@
 +incdir+../../rtl/common
 +incdir+../uvm/if
++incdir+../uvm/agent/apb
++incdir+../uvm/seq
 +incdir+../uvm/env
++incdir+../uvm/cov
 +incdir+../uvm/test
 +incdir+../uvm/common
 
@@ -10,6 +13,7 @@
 
 ../../rtl/bus/apb_decoder.sv
 ../../rtl/top/sf_soc_pkg.sv
+../../rtl/mem/sf_sram.sv
 
 ../../rtl/ip/pmu/sf_pmu_pkg.sv
 ../../rtl/ip/pmu/sf_pmu_reg_top.sv

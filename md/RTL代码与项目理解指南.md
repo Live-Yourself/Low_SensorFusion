@@ -11,7 +11,7 @@
 - `md/SOC_SensorFusion_v1_项目说明.md`
 - `md/SoC_顶层规格说明书.md`
 - `md/寄存器地图定义.md`
-- `md/UVM_Phase0_运行说明.md`
+- `md/Phase阶段运行说明.md`
 
 ---
 

@@ -47,12 +47,21 @@ module sf_soc_top (
   logic spi_sclk_o, spi_mosi_o, spi_cs_n_o;
   logic [1:0] pmu_mode;
   logic [31:0] irq_src;
+  logic        i2c0_rx_byte_vld;
+  logic        i2c0_rx_byte_last;
+  logic [7:0]  i2c0_rx_byte_data;
+  logic        i2c0_tx_byte_req;
+  logic        i2c0_tx_byte_vld;
+  logic [7:0]  i2c0_tx_byte_data;
+
+  logic        i2c1_rx_byte_vld;
+  logic        i2c1_rx_byte_last;
+  logic [7:0]  i2c1_rx_byte_data;
+  logic        i2c1_tx_byte_req;
 
   logic [31:0] prdata_mux;
   logic pready_mux;
   logic pslverr_mux;
-
-  logic [1:0] pmu_mode;
 
   sf_rst_sync u_reset_sync (
     .clk      (clk_sys),
@@ -121,6 +130,8 @@ module sf_soc_top (
     .pwrite  (apb_pwrite),      .paddr  (apb_paddr[11:0]), .pwdata(apb_pwdata),
     .prdata  (i2c0_prdata), .pready(i2c0_pready), .pslverr(i2c0_pslverr),
     .scl_i(i2c0_scl_i), .scl_o(i2c0_scl_o), .sda_i(i2c0_sda_i), .sda_o(i2c0_sda_o),
+    .tx_byte_data(i2c0_tx_byte_data), .tx_byte_vld(i2c0_tx_byte_vld), .tx_byte_req(i2c0_tx_byte_req),
+    .rx_byte_vld(i2c0_rx_byte_vld), .rx_byte_last(i2c0_rx_byte_last), .rx_byte_data(i2c0_rx_byte_data),
     .irq(i2c0_irq)
   );
 
@@ -130,6 +141,8 @@ module sf_soc_top (
     .pwrite  (apb_pwrite),      .paddr  (apb_paddr[11:0]), .pwdata(apb_pwdata),
     .prdata  (i2c1_prdata), .pready(i2c1_pready), .pslverr(i2c1_pslverr),
     .scl_i(i2c1_scl_i), .scl_o(i2c1_scl_o), .sda_i(i2c1_sda_i), .sda_o(i2c1_sda_o),
+    .tx_byte_data(8'h00), .tx_byte_vld(1'b0), .tx_byte_req(i2c1_tx_byte_req),
+    .rx_byte_vld(i2c1_rx_byte_vld), .rx_byte_last(i2c1_rx_byte_last), .rx_byte_data(i2c1_rx_byte_data),
     .irq(i2c1_irq)
   );
 
@@ -138,6 +151,8 @@ module sf_soc_top (
     .psel    (apb_psel_vec[10]), .penable(apb_penable),
     .pwrite  (apb_pwrite),       .paddr  (apb_paddr[11:0]), .pwdata(apb_pwdata),
     .prdata  (udma_prdata), .pready(udma_pready), .pslverr(udma_pslverr),
+    .i2c0_rx_vld(i2c0_rx_byte_vld), .i2c0_rx_data(i2c0_rx_byte_data), .i2c0_rx_last(i2c0_rx_byte_last), .i2c0_tx_req(i2c0_tx_byte_req),
+    .i2c0_tx_vld(i2c0_tx_byte_vld), .i2c0_tx_data(i2c0_tx_byte_data),
     .irq     (udma_irq)
   );
 
@@ -200,6 +215,8 @@ module sf_soc_top (
   logic [1:0] unused_pmu_mode;
   logic [15:0] unused_gpio_o, unused_gpio_oe;
   logic unused_spi_sclk_o, unused_spi_mosi_o, unused_spi_cs_n_o;
+  logic unused_i2c1_rx_vld, unused_i2c1_rx_last, unused_i2c1_tx_req;
+  logic [7:0] unused_i2c1_rx_data;
 
   assign unused_clk_aon   = clk_aon;
   assign unused_cpu_irq   = cpu_irq;
@@ -209,4 +226,8 @@ module sf_soc_top (
   assign unused_spi_sclk_o= spi_sclk_o;
   assign unused_spi_mosi_o= spi_mosi_o;
   assign unused_spi_cs_n_o= spi_cs_n_o;
+  assign unused_i2c1_rx_vld = i2c1_rx_byte_vld;
+  assign unused_i2c1_rx_last= i2c1_rx_byte_last;
+  assign unused_i2c1_tx_req = i2c1_tx_byte_req;
+  assign unused_i2c1_rx_data= i2c1_rx_byte_data;
 endmodule
